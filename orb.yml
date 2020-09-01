@@ -1,0 +1,275 @@
+version: "2.1"
+description: |
+  Provides convenient access to Cloudify Manager from within CircleCI
+  jobs.
+
+  General notes:
+  --------------
+
+  * Occasionally, the value "-" is used as a default value for string
+    parameters. This is done in order to simplify the construction
+    construction of command
+display:
+  home_url: "https://cloudify.co"
+  source_url: "https://github.com/cloudify-cosmo/circleci-orb"
+executors:
+  default:
+    docker:
+      - image: 263721492972.dkr.ecr.ca-central-1.amazonaws.com/cfyci
+        aws_auth:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+commands:
+  create:
+    description: |
+      Creates a Cloudify environment. This is equivalent to calling
+      `cfy install`: uploading a blueprint, creating a deployment
+      ("environment"), and running the `install` workflow in one shot.
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      blueprint:
+        description: URL/path to blueprint
+        type: string
+      inputs_file:
+        description: YAML/JSON file containing deployment inputs
+        type: string
+        default: "-"
+      outputs_file:
+        description: Path to generated environment output data
+        type: string
+        default: "-"
+    steps:
+      - run:
+          name: Create Cloudify Environment
+          command: |
+            cfyci create-environment --name << parameters.environment_name >> \
+              --blueprint << parameters.blueprint >> \
+              --inputs << parameters.inputs_file >> \
+              --outputs << parameters.outputs_file >>
+  delete:
+    description: |
+      Deletes a Cloudify environment.
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      ignore_failure:
+        description: |
+          Whether errors, encountered during deletion, are to be ignored.
+        type: boolean
+        default: false
+    steps:
+      - run:
+          name: Delete Cloudify Environment
+          command: |
+            cfyci delete-environment --name << parameters.environment_name >> \
+              --ignore-failure << parameters.ignore_failure >>
+  arm:
+    description: |
+      Creates an Azure ARM environment.
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      resource_group:
+        description: Azure Resource Group to create
+        type: string
+      template_file:
+        description: Path/URL of ARM template
+        type: string
+      parameters_file:
+        description: YAML/JSON file containing template parameters
+        type: string
+        default: "-"
+      outputs_file:
+        description: Path to generated environment output data
+        type: string
+        default: "-"
+    steps:
+      - run:
+          name: Create ARM environment
+          command: |
+            cfyci arm --name << parameters.environment_name >> \
+              --resource-group << parameters.resource_group >> \
+              --template-file << parameters.template_file >> \
+              --parameters-file << parameters.parameters_file >> \
+              --outputs << parameters.outputs_file >>
+  cfn:
+    description: |
+      Creates an AWS CloudFormation environment.
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      stack_name:
+        description: CloudFormation's stack name
+        type: string
+      template_url:
+        description: URL of CloudFormation template
+        type: string
+      parameters_file:
+        description: YAML/JSON file containing template parameters
+        type: string
+        default: "-"
+      outputs_file:
+        description: Path to generated environment output data
+        type: string
+        default: "-"
+    steps:
+      - run:
+          name: Create CloudFormation environment
+          command: |
+            cfyci cfn --name << parameters.environment_name >> \
+              --stack-name << parameters.stack_name >> \
+              --template-url << parameters.template_url >> \
+              --parameters-file << parameters.parameters_file >> \
+              --outputs << parameters.outputs_file >>
+  terraform:
+    description: |
+      Creates a Terraform environment.
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      module_file:
+        description: URL/path to Terraform module archive
+        type: string
+      variables_file:
+        description: YAML/JSON file containing template variables
+        type: string
+        default: "-"
+      environment_file:
+        description: YAML/JSON file containing environment variables to pass to the Terraform process
+        type: string
+        default: "-"
+      environment_mapping:
+        description: |
+          A whitespace-delimited list of strings. For each item:
+
+          * If it is of the form `k=v`, then the value of the environment variable `k` is passed
+            as environment variable `v` to Terraform
+          * Otherwise, let the value be `x`; then the environment variable `x` is passed as-is
+            to Terraform
+
+          This effectively passes environment variables defined at the project's scope
+          (or workflow context) as environment variables to Terraform. Useful, among others, for
+          passing Cloud credentials defined in CircleCI to Terraform.
+        type: string
+        default: ""
+      outputs_file:
+        description: Path to generated environment output data
+        type: string
+        default: "-"
+    steps:
+      - run:
+          name: Create Terraform environment
+          command: |
+            cfyci terraform --name << parameters.environment_name >> \
+              --module << parameters.module_file >> \
+              --variables << parameters.variables_file >> \
+              --environment << parameters.environment_file >> \
+              --environment-mapping << parameters.environment_mapping >> \
+              --outputs << parameters.outputs_file >>
+  kubernetes:
+    description: |
+      Creates a Kubernetes environment
+    parameters:
+      environment_name:
+        description: Environment's name
+        type: string
+      gcp_credentials_file:
+        description: |
+          Path to file containing GCP service account details. This is optional; either
+          this or `token_file` must be provided, but not both
+        type: string
+        default: "-"
+      token:
+        description: |
+          Kubernetes API token. This is optional; exactly one of [`token`,
+          `token_file`, `gcp_credentials_file`] must be provided
+        type: string
+        default: "-"
+      token_file:
+        description: |
+          Path to file containing an API token. This is optional; either this
+          or `gcp_credentials_file` must be provided, but not both
+        type: string
+        default: "-"
+      master_host:
+        description: Hostname/IP of the main Kubernetes host
+        type: string
+      namespace:
+        description: Application's namespace
+        type: string
+        default: "-"
+      app_definition_file:
+        description: Path to Kubernetes application definition file
+        type: string
+      ca_cert_file:
+        description: |
+          Path, on Cloudify Manager, of a file to use as a CA trust store when connecting
+          to the Kubernetes master host
+        type: string
+        default: "-"
+      ssl_cert_file:
+        description: |
+          Path, on Cloudify Manager, of a file to use as a certificate presented to the
+          Kubernetes master host upon connection
+        type: string
+        default: "-"
+      ssl_key_file:
+        description: |
+          Path, on Cloudify Manager, of the private key file associated with the certificate
+          specified by `ssl_cert_file`
+        type: string
+        default: "-"
+      skip_ssl_verification:
+        description: Whether to verify SSL connections
+        type: boolean
+        default: false
+      other_options_file:
+        description: |
+          YAML/JSON file containing additional Kubernetes options, to be passed along
+          with the namespace
+        type: string
+        default: "-"
+      validate_status:
+        description: |
+          Whether to validate the status of the application upon creation
+        type: boolean
+        default: false
+      allow_node_redefinition:
+        description: |
+          Whether to allow Kubernetes node redefinition
+        type: boolean
+        default: false
+      debug:
+        description: Whether to generate debug logging of Kubernetes calls
+        type: boolean
+        default: false
+      outputs_file:
+        description: Path to generated environment output data
+        type: string
+        default: "-"
+    steps:
+      - run:
+          name: Create Kubernetes environment
+          command: |
+            cfyci k8s --name << parameters.environment_name >> \
+              --gcp-credentials-file << parameters.gcp_credentials_file >> \
+              --token << parameters.token >> \
+              --token-file << parameters.token_file >> \
+              --master-host << parameters.master_host >> \
+              --namespace << parameters.namespace >> \
+              --app-definition-file << parameters.app_definition_file >> \
+              --ca-cert-file << parameters.ca_cert_file >> \
+              --ssl-cert-file << parameters.ssl_cert_file >> \
+              --ssl-key-file << parameters.ssl_key_file >> \
+              --skip-ssl-verification << parameters.skip_ssl_verification >> \
+              --other-options-file << parameters.other_options_file >> \
+              --validate-status << parameters.validate_status >> \
+              --allow-node-redefinition << parameters.allow_node_redefinition >> \
+              --debug << parameters.debug >> \
+              --outputs << parameters.outputs_file >>
