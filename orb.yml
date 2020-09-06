@@ -42,7 +42,7 @@ display:
 executors:
   default:
     docker:
-      - image: cloudifyplatform/cloudify-cli:latest
+      - image: isaaccfy/cfy-ci:latest
 commands:
   create:
     description: |
