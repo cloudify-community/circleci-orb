@@ -42,10 +42,7 @@ display:
 executors:
   default:
     docker:
-      - image: 263721492972.dkr.ecr.ca-central-1.amazonaws.com/cfyci
-        aws_auth:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+      - image: cloudifyplatform/cloudify-cli:latest
 commands:
   create:
     description: |
