@@ -75,7 +75,7 @@ commands:
             cfyci create-environment --name << parameters.environment_name >> \
               --blueprint << parameters.blueprint >> \
               --inputs << parameters.inputs_file >> \
-              --outputs << parameters.outputs_file >>
+              --outputs-file << parameters.outputs_file >>
   delete:
     description: |
       Deletes a Cloudify environment.
@@ -131,7 +131,7 @@ commands:
               --resource-group << parameters.resource_group >> \
               --template-file << parameters.template_file >> \
               --parameters-file << parameters.parameters_file >> \
-              --outputs << parameters.outputs_file >>
+              --outputs-file << parameters.outputs_file >>
   cfn:
     description: |
       Creates an AWS CloudFormation environment.
@@ -165,7 +165,7 @@ commands:
               --stack-name << parameters.stack_name >> \
               --template-url << parameters.template_url >> \
               --parameters-file << parameters.parameters_file >> \
-              --outputs << parameters.outputs_file >>
+              --outputs-file << parameters.outputs_file >>
   terraform:
     description: |
       Creates a Terraform environment.
@@ -193,9 +193,9 @@ commands:
           * Otherwise, let the value be `x`; then the environment variable `x` is passed as-is
             to Terraform
 
-          This effectively passes environment variables defined at the project's scope
-          (or workflow context) as environment variables to Terraform. Useful, among others, for
-          passing Cloud credentials defined in CircleCI to Terraform.
+          This effectively passes environment variables, visible to the CI/CD platform,
+          as environment variables to Terraform. Useful, among others, for
+          passing Cloud credentials - stored in the CI/CD platform - to Terraform.
         type: string
         default: ""
       outputs_file:
@@ -215,7 +215,7 @@ commands:
               --variables << parameters.variables_file >> \
               --environment << parameters.environment_file >> \
               --environment-mapping << parameters.environment_mapping >> \
-              --outputs << parameters.outputs_file >>
+              --outputs-file << parameters.outputs_file >>
   kubernetes:
     description: |
       Creates a Kubernetes environment
@@ -320,4 +320,4 @@ commands:
               --validate-status << parameters.validate_status >> \
               --allow-node-redefinition << parameters.allow_node_redefinition >> \
               --debug << parameters.debug >> \
-              --outputs << parameters.outputs_file >>
+              --outputs-file << parameters.outputs_file >>
