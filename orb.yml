@@ -31,11 +31,6 @@ description: |
   * Occasionally, the value "-" is used as a default value for string
     parameters. This is done in order to simplify the construction
     construction of command
-  * Each command starts with a call to `cfyci init`, in order to ensure
-    that a `cfy` profile exists, based on the `CLOUDIFY_*` environment
-    variables. This could have been avoided if the Cloudify CLI
-    would support providing the Cloudify Manager hostname via an
-    environment variable.
 display:
   home_url: "https://cloudify.co"
   source_url: "https://github.com/cloudify-cosmo/circleci-orb"
@@ -66,10 +61,6 @@ commands:
         default: "-"
     steps:
       - run:
-          name: Initialize profile
-          command: |
-            cfyci init
-      - run:
           name: Create Cloudify Environment
           command: |
             cfyci create-environment --name << parameters.environment_name >> \
@@ -89,10 +80,6 @@ commands:
         type: boolean
         default: false
     steps:
-      - run:
-          name: Initialize profile
-          command: |
-            cfyci init
       - run:
           name: Delete Cloudify Environment
           command: |
@@ -120,10 +107,6 @@ commands:
         type: string
         default: "-"
     steps:
-      - run:
-          name: Initialize profile
-          command: |
-            cfyci init
       - run:
           name: Create ARM environment
           command: |
@@ -154,10 +137,6 @@ commands:
         type: string
         default: "-"
     steps:
-      - run:
-          name: Initialize profile
-          command: |
-            cfyci init
       - run:
           name: Create CloudFormation environment
           command: |
@@ -203,10 +182,6 @@ commands:
         type: string
         default: "-"
     steps:
-      - run:
-          name: Initialize profile
-          command: |
-            cfyci init
       - run:
           name: Create Terraform environment
           command: |
@@ -298,10 +273,6 @@ commands:
         type: string
         default: "-"
     steps:
-      - run:
-          name: Initialize profile
-          command: |
-            cfyci init
       - run:
           name: Create Kubernetes environment
           command: |
