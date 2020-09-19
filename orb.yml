@@ -3,34 +3,9 @@ description: |
   Provides convenient access to Cloudify Manager from within CircleCI
   jobs.
 
-  Prerequisites:
-  --------------
-
-  The following environment variables need to be defined for virtually any
-  Cloudify operation:
-
-  * `CLOUDIFY_HOST`: Cloudify Manager's hostname
-  * `CLOUDIFY_USERNAME`: User to authenticate with
-  * `CLOUDIFY_PASSWORD`: Password to authenticate with
-
-  In addition, `CLOUDIFY_TENANT_NAME` may be defined as the tenant name to work with. If not
-  defined, then `default_tenant` is used.
-
-  SSL Configuration:
-  ------------------
-
-  By default, connections to Cloudify Manager are attempted in SSL mode. To disable that,
-  define the `CLOUDIFY_SSL` environment variable as `false`.
-
-  If Cloudify Manager is SSL-protected, using a certificate that is not publicly trusted,
-  then define the `CLOUDIFY_SSL_TRUST_ALL` environment variable as `true`.
-
-  General notes:
-  --------------
-
-  * Occasionally, the value "-" is used as a default value for string
-    parameters. This is done in order to simplify the construction
-    construction of command
+  Refer to the official product documentation at https://docs.cloudify.co/latest/working_with/integration/
+  for information about Cloudify's integration with CI/CD tools, including information that pertains
+  to CircleCI.
 display:
   home_url: "https://cloudify.co"
   source_url: "https://github.com/cloudify-cosmo/circleci-orb"
@@ -39,24 +14,35 @@ executors:
     docker:
       - image: isaaccfy/cfy-ci:latest
 commands:
+  init:
+    description: |
+      Initializes a Cloudify CLI profile.
+
+      Use this Action if your job actually requires a CLI profile; for example - when using the Cloudify CLI
+      (`cfy`) directly. `cfyci` commands create a CLI profile automatically.
+    steps:
+      - run:
+          name: Initialize CLI Profile
+          command: |
+            cfyci init
   create:
     description: |
-      Creates a Cloudify environment. This is equivalent to calling
-      `cfy install`: uploading a blueprint, creating a deployment
-      ("environment"), and running the `install` workflow in one shot.
+      Creates an environment by uploading a blueprint, creating a deployment and running the `install` workflow.
     parameters:
       environment_name:
-        description: Environment's name
+        description: Name of Cloudify environment to create
         type: string
       blueprint:
-        description: URL/path to blueprint
+        description: Path/URL to blueprint (YAML file or archive file)
         type: string
       inputs_file:
-        description: YAML/JSON file containing deployment inputs
+        description: Path to YAML/JSON inputs file
         type: string
         default: "-"
       outputs_file:
-        description: Path to generated environment output data
+        description: |
+          Path to JSON file to receive the Cloudify environment's outputs
+          and capabilities
         type: string
         default: "-"
     steps:
@@ -69,14 +55,20 @@ commands:
               --outputs-file << parameters.outputs_file >>
   delete:
     description: |
-      Deletes a Cloudify environment.
+      Deletes an environment by running the `uninstall` workflow and deleting the
+      deployment. Optionally, also deletes the blueprint from which the deployment was created.
     parameters:
       environment_name:
-        description: Environment's name
+        description: Name of Cloudify environment to delete
         type: string
-      ignore_failure:
+      delete_blueprint:
         description: |
-          Whether errors, encountered during deletion, are to be ignored.
+          If no more deployments exist for the blueprint, then delete the
+          blueprint as well
+        type: boolean
+        default: false
+      ignore_failure:
+        description: Whether or not to ignore failures during deletion
         type: boolean
         default: false
     steps:
@@ -84,29 +76,33 @@ commands:
           name: Delete Cloudify Environment
           command: |
             cfyci delete-environment --name << parameters.environment_name >> \
+              --delete-blueprint << parameters.delete_blueprint >> \
               --ignore-failure << parameters.ignore_failure >>
   arm:
     description: |
       Creates an Azure ARM environment.
     parameters:
       environment_name:
-        description: Environment's name
+        description: Name of Cloudify environment to create
         type: string
       resource_group:
-        description: Azure Resource Group to create
-        type: string
-      location:
-        description: Azure location where the resource group should be created
+        description: Name of resource group to create
         type: string
       template_file:
-        description: Path/URL of ARM template
+        description: URL/path to template file
         type: string
       parameters_file:
         description: YAML/JSON file containing template parameters
         type: string
         default: "-"
+      location:
+        description: Azure location to create resource group in
+        type: string
+        default: "-"
       outputs_file:
-        description: Path to generated environment output data
+        description: |
+          Path to JSON file to receive the Cloudify environment's outputs
+          and capabilities
         type: string
         default: "-"
     steps:
