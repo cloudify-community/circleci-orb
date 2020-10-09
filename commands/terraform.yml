@@ -1,0 +1,45 @@
+description: |
+  Creates a Terraform environment.
+parameters:
+  environment_name:
+    description: Environment's name
+    type: string
+  module_file:
+    description: URL/path to Terraform module archive
+    type: string
+  variables_file:
+    description: YAML/JSON file containing template variables
+    type: string
+    default: "-"
+  environment_file:
+    description: YAML/JSON file containing environment variables to pass to the Terraform process
+    type: string
+    default: "-"
+  environment_mapping:
+    description: |
+      A whitespace-delimited list of strings. For each item:
+
+      * If it is of the form `k=v`, then the value of the environment variable `k` is passed
+        as environment variable `v` to Terraform
+      * Otherwise, let the value be `x`; then the environment variable `x` is passed as-is
+        to Terraform
+
+      This effectively passes environment variables, visible to the CI/CD platform,
+      as environment variables to Terraform. Useful, among others, for
+      passing Cloud credentials - stored in the CI/CD platform - to Terraform.
+    type: string
+    default: ""
+  outputs_file:
+    description: Path to generated environment output data
+    type: string
+    default: "-"
+steps:
+  - run:
+      name: Create Terraform environment
+      command: |
+        cfyci terraform --name << parameters.environment_name >> \
+          --module << parameters.module_file >> \
+          --variables << parameters.variables_file >> \
+          --environment << parameters.environment_file >> \
+          --environment-mapping << parameters.environment_mapping >> \
+          --outputs-file << parameters.outputs_file >>

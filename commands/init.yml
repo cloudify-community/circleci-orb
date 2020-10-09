@@ -1,0 +1,10 @@
+description: |
+  Initializes a Cloudify CLI profile.
+
+  Use this Action if your job actually requires a CLI profile; for example - when using the Cloudify CLI
+  (`cfy`) directly. `cfyci` commands create a CLI profile automatically.
+steps:
+  - run:
+      name: Initialize CLI Profile
+      command: |
+        cfyci init

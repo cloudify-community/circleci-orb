@@ -1,0 +1,24 @@
+description: |
+  Deletes an environment by running the `uninstall` workflow and deleting the
+  deployment. Optionally, also deletes the blueprint from which the deployment was created.
+parameters:
+  environment_name:
+    description: Name of Cloudify environment to delete
+    type: string
+  delete_blueprint:
+    description: |
+      If no more deployments exist for the blueprint, then delete the
+      blueprint as well
+    type: boolean
+    default: false
+  ignore_failure:
+    description: Whether or not to ignore failures during deletion
+    type: boolean
+    default: false
+steps:
+  - run:
+      name: Delete Cloudify Environment
+      command: |
+        cfyci delete-environment --name << parameters.environment_name >> \
+          --delete-blueprint << parameters.delete_blueprint >> \
+          --ignore-failure << parameters.ignore_failure >>

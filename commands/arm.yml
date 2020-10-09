@@ -1,0 +1,36 @@
+description: |
+  Creates an Azure ARM environment.
+parameters:
+  environment_name:
+    description: Name of Cloudify environment to create
+    type: string
+  resource_group:
+    description: Name of resource group to create
+    type: string
+  template_file:
+    description: URL/path to template file
+    type: string
+  parameters_file:
+    description: YAML/JSON file containing template parameters
+    type: string
+    default: "-"
+  location:
+    description: Azure location to create resource group in
+    type: string
+    default: "-"
+  outputs_file:
+    description: |
+      Path to JSON file to receive the Cloudify environment's outputs
+      and capabilities
+    type: string
+    default: "-"
+steps:
+  - run:
+      name: Create ARM environment
+      command: |
+        cfyci arm --name << parameters.environment_name >> \
+          --resource-group << parameters.resource_group >> \
+          --location << parameters.location >> \
+          --template-file << parameters.template_file >> \
+          --parameters-file << parameters.parameters_file >> \
+          --outputs-file << parameters.outputs_file >>

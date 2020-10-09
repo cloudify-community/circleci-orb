@@ -1,0 +1,5 @@
+docker:
+  - image: cloudifyplatform/cloudify-cli:5.0.5.1
+    auth:
+      username: $DOCKERHUB_USERNAME
+      password: $DOCKERHUB_PASSWORD

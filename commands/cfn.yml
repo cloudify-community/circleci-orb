@@ -1,0 +1,58 @@
+description: |
+  Creates an AWS CloudFormation environment.
+
+  The template can be provided in any of the following ways:
+
+  * Via the `template_url` parameter, containing a URL that points
+    to the template. Note that, in this case, the template must reside
+    in an S3 bucket.
+  * Via a combination of the `bucket_name` and `resource_name` parameters.
+  * Via the `template_file` parameter, pointing to a file that contains the
+    template body.
+parameters:
+  environment_name:
+    description: Environment's name.
+    type: string
+  stack_name:
+    description: CloudFormation's stack name.
+    type: string
+  template_file:
+    description: Path to the file containing the template.
+    type: string
+    default: "-"
+  bucket_name:
+    description: |
+      Name of S3 bucket to get the template from. If specified,
+      then "resource_name" must also be specified.
+    type: string
+    default: "-"
+  resource_name:
+    description: |
+      Name of file, within the bucket specified by `bucket_name`, containing
+      the template to be used.
+    type: string
+    default: "-"
+  template_url:
+    description: URL of CloudFormation template.
+    type: string
+    default: "-"
+  parameters_file:
+    description: YAML/JSON file containing template parameters.
+    type: string
+    default: "-"
+  outputs_file:
+    description: Path to generated environment output data.
+    type: string
+    default: "-"
+steps:
+  - run:
+      name: Create CloudFormation environment
+      command: |
+        cfyci cfn --name << parameters.environment_name >> \
+          --stack-name << parameters.stack_name >> \
+          --template-file << parameters.template_file >> \
+          --bucket-name << parameters.bucket_name >> \
+          --resource-name << parameters.resource_name >> \
+          --template-url << parameters.template_url >> \
+          --parameters-file << parameters.parameters_file >> \
+          --outputs-file << parameters.outputs_file >>

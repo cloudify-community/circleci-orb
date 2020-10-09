@@ -1,0 +1,27 @@
+description: |
+  Creates an environment by uploading a blueprint, creating a deployment and running the `install` workflow.
+parameters:
+  environment_name:
+    description: Name of Cloudify environment to create
+    type: string
+  blueprint:
+    description: Path/URL to blueprint (YAML file or archive file)
+    type: string
+  inputs_file:
+    description: Path to YAML/JSON inputs file
+    type: string
+    default: "-"
+  outputs_file:
+    description: |
+      Path to JSON file to receive the Cloudify environment's outputs
+      and capabilities
+    type: string
+    default: "-"
+steps:
+  - run:
+      name: Create Cloudify Environment
+      command: |
+        cfyci create-environment --name << parameters.environment_name >> \
+          --blueprint << parameters.blueprint >> \
+          --inputs << parameters.inputs_file >> \
+          --outputs-file << parameters.outputs_file >>
