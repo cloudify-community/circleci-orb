@@ -2,10 +2,6 @@ version: "2.1"
 description: |
   Provides convenient access to Cloudify Manager from within CircleCI
   jobs.
-
-  Refer to the official product documentation at https://docs.cloudify.co/latest/working_with/integration/
-  for information about Cloudify's integration with CI/CD tools, including information that pertains
-  to CircleCI.
 display:
   home_url: "https://cloudify.co"
   source_url: "https://github.com/cloudify-cosmo/circleci-orb"
@@ -13,6 +9,9 @@ executors:
   default:
     docker:
       - image: cloudifyplatform/cloudify-cli:5.0.5.1
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
 commands:
   init:
     description: |
